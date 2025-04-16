@@ -43,16 +43,18 @@ void AMainCharacter::Tick(float DeltaTime)
 void AMainCharacter::SetCurrentWeapon(AWeaponMaster* NewWeapon)
 {
 	CurrentWeapon = NewWeapon;
-	FireMode = CurrentWeapon->FireMode;
-	FireAnimation = CurrentWeapon->FireAnimation;
-	ReloadAnimation = CurrentWeapon->ReloadAnimation;
 
 	if (CurrentWeapon)
 	{
+		FireMode = CurrentWeapon->FireMode;
+		FireAnimation = CurrentWeapon->FireAnimation;
+		ReloadAnimation = CurrentWeapon->ReloadAnimation;
 		CurrentWeaponName = CurrentWeapon->WeaponName;
 	}
 	else
 	{
+		FireAnimation = nullptr;
+		ReloadAnimation = nullptr;
 		CurrentWeaponName = EWeaponName();
 	}
 }
@@ -74,11 +76,25 @@ bool AMainCharacter::HasEnoughStamina(float Cost)
 
 void AMainCharacter::EquipWeapon(ELoadoutSlot Slot)
 {
-	if (!LoadoutComp){ return; }
-
-	AWeaponMaster* DesiredWeapon = LoadoutComp->GetWeapon(Slot);
-	if (DesiredWeapon)
+	if (!LoadoutComp) return;
+    
+	AWeaponMaster* WeaponToEquip = LoadoutComp->GetWeapon(Slot);
+    
+	if (WeaponToEquip)
 	{
-		SetCurrentWeapon(DesiredWeapon);
+		SetCurrentWeapon(WeaponToEquip);
 	}
+}
+
+
+void AMainCharacter::SwapWeapon(ELoadoutSlot Slot)
+{
+	if (!LoadoutComp) return;
+
+	if (!LoadoutComp->Loadout.Contains(Slot) || !LoadoutComp->Loadout[Slot])
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Attempted to swap to empty slot %d"), static_cast<int32>(Slot));
+		return;
+	}
+	EquipWeapon(Slot);
 }

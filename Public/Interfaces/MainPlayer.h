@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Pickups/WeaponMaster.h"
 #include "UObject/Interface.h"
 #include "MainPlayer.generated.h"
 
@@ -23,9 +24,9 @@ class ZOMBIES_API IMainPlayer
 
 public:
 	virtual bool HasEnoughStamina(float Cost){ return true; }
-
-	// 
 	virtual void EquipWeapon(ELoadoutSlot Slot) = 0;
 	virtual void SwapWeapon(ELoadoutSlot Slot) = 0;
-	virtual void GetLoadoutComponent();
+	
+	virtual class ULoadoutComponent* GetLoadoutComponent() = 0;
+
 };

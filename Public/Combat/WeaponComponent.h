@@ -54,15 +54,6 @@ public:
 
 	void CheckAmmo();
 
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	// int32 WeaponIndex;
-	//
-	// UFUNCTION(BlueprintCallable, Category = "Weapon")
-	// void SetWeaponIndex(int32 NewIndex);
-	//
-	// UFUNCTION(BlueprintCallable, Category = "Weapon")
-	// int32 GetWeaponIndex() const { return WeaponIndex; }
-
 	// UFUNCTION()
 	// void GetWeaponType();
 	//

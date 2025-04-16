@@ -49,6 +49,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category="Ammo")
 	int32 CurrentMagAmmo{ StartingMagAmmo };
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName WeaponSocketName;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

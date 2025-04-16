@@ -24,6 +24,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStatsComponent* StatsComp;
+
+	virtual ULoadoutComponent* GetLoadoutComponent() override { return LoadoutComp; }
 	
 	TArray<AActor*>& GetNearbyInteractables();
 	TArray<AActor*> NearbyInteractables;

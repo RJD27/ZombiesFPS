@@ -25,6 +25,8 @@ class ZOMBIES_API UPlayerActionsComponent : public UActorComponent, public IInte
 	
 	TWeakObjectPtr<AMainCharacter> CharacterRef;
 
+	TMap<ELoadoutSlot, AWeaponMaster*> WeaponLoadout;
+
 	class IMainPlayer* IPlayerRef;
 
 	class UCharacterMovementComponent* MovementComp;
@@ -53,6 +55,9 @@ class ZOMBIES_API UPlayerActionsComponent : public UActorComponent, public IInte
 	FVector GetSpawnLocation() const;
 
 	UTraceComponent* GetTraceComponent();
+
+	UPROPERTY()
+	ELoadoutSlot CurrentActiveSlot;
 	
 public:
 	UPlayerActionsComponent();
@@ -117,4 +122,9 @@ public:
 	virtual void ModifyReserveAmmo(int32 Amount) override;
 	
 	void InitializeAmmoFromWeapon(AWeaponMaster* WeaponMaster);
+    
+    UFUNCTION(BlueprintCallable)
+	void SwapWeapon(ELoadoutSlot Slot);
+	
+	bool SetCurrentActiveSlot(ELoadoutSlot NewSlot);
 };
