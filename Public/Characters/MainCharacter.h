@@ -10,7 +10,6 @@
 #include "Pickups/WeaponMaster.h"
 #include "MainCharacter.generated.h"
 
-class ULoadoutComponent;
 class UPlayerActionsComponent;
 
 UCLASS()
@@ -24,8 +23,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStatsComponent* StatsComp;
-
-	virtual ULoadoutComponent* GetLoadoutComponent() override { return LoadoutComp; }
+	class ULoadoutComponent* LoadoutComponent;
 	
 	TArray<AActor*>& GetNearbyInteractables();
 	TArray<AActor*> NearbyInteractables;

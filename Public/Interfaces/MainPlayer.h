@@ -26,7 +26,4 @@ public:
 	virtual bool HasEnoughStamina(float Cost){ return true; }
 	virtual void EquipWeapon(ELoadoutSlot Slot) = 0;
 	virtual void SwapWeapon(ELoadoutSlot Slot) = 0;
-	
-	virtual class ULoadoutComponent* GetLoadoutComponent() = 0;
-
 };

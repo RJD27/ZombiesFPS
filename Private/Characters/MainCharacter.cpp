@@ -76,13 +76,9 @@ bool AMainCharacter::HasEnoughStamina(float Cost)
 
 void AMainCharacter::EquipWeapon(ELoadoutSlot Slot)
 {
-	if (!LoadoutComp) return;
-    
-	AWeaponMaster* WeaponToEquip = LoadoutComp->GetWeapon(Slot);
-    
-	if (WeaponToEquip)
+	if (PlayerActionsComp)
 	{
-		SetCurrentWeapon(WeaponToEquip);
+		PlayerActionsComp->EquipWeapon(Slot);
 	}
 }
 

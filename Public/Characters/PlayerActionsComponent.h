@@ -24,12 +24,12 @@ class ZOMBIES_API UPlayerActionsComponent : public UActorComponent, public IInte
 	GENERATED_BODY()
 	
 	TWeakObjectPtr<AMainCharacter> CharacterRef;
-
-	TMap<ELoadoutSlot, AWeaponMaster*> WeaponLoadout;
-
+	
 	class IMainPlayer* IPlayerRef;
 
 	class UCharacterMovementComponent* MovementComp;
+
+	class ULoadoutComponent* LoadoutComp;
 
 	UPROPERTY(EditAnywhere)
 	float SprintCost{ 0.1f };
@@ -61,9 +61,6 @@ class ZOMBIES_API UPlayerActionsComponent : public UActorComponent, public IInte
 	
 public:
 	UPlayerActionsComponent();
-
-	// UPROPERTY(BlueprintAssignable, Category = "Events")
-	// FOnFireEvent OnFireEvent;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsReloadActive{ false };
@@ -125,6 +122,8 @@ public:
     
     UFUNCTION(BlueprintCallable)
 	void SwapWeapon(ELoadoutSlot Slot);
-	
-	bool SetCurrentActiveSlot(ELoadoutSlot NewSlot);
+
+	void AddAndEquip(ELoadoutSlot Slot, AWeaponMaster* Weapon);
+
+	void EquipWeapon(ELoadoutSlot Slot);
 };

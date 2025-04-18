@@ -90,6 +90,25 @@ void ULoadoutComponent::RemoveFromLoadout(ELoadoutSlot Slot)
 	UE_LOG(LogTemp, Log, TEXT("Removed weapon from slot %d"), static_cast<int32>(Slot));
 }
 
+bool ULoadoutComponent::SetCurrentActiveSlot(ELoadoutSlot NewSlot)
+{
+	if (!Loadout.Contains(NewSlot) || !Loadout[NewSlot])
+	{
+		return false;
+	}
+    
+	CurrentActiveSlot = NewSlot;
+    
+	AWeaponMaster* NewWeapon = Loadout[NewSlot];
+    
+	if (IsValid(CharacterRef))
+	{
+		CharacterRef->SetCurrentWeapon(NewWeapon);
+	}
+	return true;
+	
+}
+
 AWeaponMaster* ULoadoutComponent::GetWeapon(ELoadoutSlot Slot) const
 {
 	return Loadout.Contains(Slot) ? Loadout[Slot] : nullptr;

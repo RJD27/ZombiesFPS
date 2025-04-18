@@ -38,8 +38,11 @@ public:
 	void AddToLoadout(ELoadoutSlot Slot, AWeaponMaster* Weapon);
 
 	void RemoveFromLoadout(ELoadoutSlot Slot);
+
+	bool SetCurrentActiveSlot(ELoadoutSlot NewSlot);
+
+	UPROPERTY()
+	ELoadoutSlot CurrentActiveSlot = ELoadoutSlot::Primary;
 	
 	AWeaponMaster* GetWeapon(ELoadoutSlot Slot) const;
-
-
 };
