@@ -10,6 +10,7 @@
 #include "Combat/TraceComponent.h"
 #include "Combat/WeaponComponent.h"
 #include "Pickups/WeaponMaster.h"
+#include "Pickups/WeaponPickup.h"
 
 // Sets default values
 AMainCharacter::AMainCharacter()
@@ -30,7 +31,6 @@ AMainCharacter::AMainCharacter()
 void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame

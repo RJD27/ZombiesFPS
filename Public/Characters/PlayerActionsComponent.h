@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ELoadoutSlot.h"
 #include "MainCharacter.h"
 #include "Components/ActorComponent.h"
 #include "Interfaces/AmmoCarrier.h"
@@ -47,6 +48,8 @@ class ZOMBIES_API UPlayerActionsComponent : public UActorComponent, public IInte
 	UAnimMontage* FireAnimMontage;
 	
 	bool bIsFiring{ false };
+
+	bool bIsSwapping{ false };
 	
 	FTimerHandle ReloadTimerHandle;
 	
@@ -56,8 +59,6 @@ class ZOMBIES_API UPlayerActionsComponent : public UActorComponent, public IInte
 
 	UTraceComponent* GetTraceComponent();
 
-	UPROPERTY()
-	ELoadoutSlot CurrentActiveSlot;
 	
 public:
 	UPlayerActionsComponent();
@@ -119,11 +120,16 @@ public:
 	virtual void ModifyReserveAmmo(int32 Amount) override;
 	
 	void InitializeAmmoFromWeapon(AWeaponMaster* WeaponMaster);
-    
-    UFUNCTION(BlueprintCallable)
-	void SwapWeapon(ELoadoutSlot Slot);
+	
+	void SwitchToWeaponSlot(ELoadoutSlot Slot);
 
 	void AddAndEquip(ELoadoutSlot Slot, AWeaponMaster* Weapon);
 
 	void EquipWeapon(ELoadoutSlot Slot);
+
+	UFUNCTION(BlueprintCallable)
+	void ToggleWeapon();
+
+	ELoadoutSlot CurrentSlot;
+
 };

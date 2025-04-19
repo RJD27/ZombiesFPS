@@ -19,6 +19,8 @@ class ZOMBIES_API ULoadoutComponent : public UActorComponent
 
 	class AMainCharacter* CharacterRef;
 	
+	ELoadoutSlot CurrentActiveSlot;
+	
 public:	
 	// Sets default values for this component's properties
 	ULoadoutComponent();
@@ -33,6 +35,8 @@ protected:
 public:
 	virtual bool IsSecondarySlotFree() const;
 
+	virtual bool IsPrimarySlotFree() const;
+
 	virtual bool HasSameWeapon(EWeaponName WeaponName) const;
 
 	void AddToLoadout(ELoadoutSlot Slot, AWeaponMaster* Weapon);
@@ -41,8 +45,12 @@ public:
 
 	bool SetCurrentActiveSlot(ELoadoutSlot NewSlot);
 
-	UPROPERTY()
-	ELoadoutSlot CurrentActiveSlot = ELoadoutSlot::Primary;
+	UFUNCTION(BlueprintCallable)
+	ELoadoutSlot GetCurrentActiveSlot() const{
+		return CurrentActiveSlot;
+	}
 	
 	AWeaponMaster* GetWeapon(ELoadoutSlot Slot) const;
+
+
 };

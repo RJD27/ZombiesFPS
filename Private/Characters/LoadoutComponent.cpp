@@ -33,6 +33,12 @@ bool ULoadoutComponent::IsSecondarySlotFree() const
 		|| Loadout[ELoadoutSlot::Secondary] == nullptr;
 }
 
+bool ULoadoutComponent::IsPrimarySlotFree() const
+{
+	return !Loadout.Contains(ELoadoutSlot::Primary)
+		|| Loadout[ELoadoutSlot::Primary] == nullptr;
+}
+
 bool ULoadoutComponent::HasSameWeapon(EWeaponName WeaponName) const
 {
 	if (Loadout.Contains(ELoadoutSlot::Primary))
@@ -113,3 +119,4 @@ AWeaponMaster* ULoadoutComponent::GetWeapon(ELoadoutSlot Slot) const
 {
 	return Loadout.Contains(Slot) ? Loadout[Slot] : nullptr;
 }
+

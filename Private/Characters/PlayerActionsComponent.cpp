@@ -3,6 +3,7 @@
 
 #include "Characters/PlayerActionsComponent.h"
 
+#include "SWarningOrErrorBox.h"
 #include "Characters/ELoadoutSlot.h"
 #include "Characters/LoadoutComponent.h"
 #include "Characters/MainCharacter.h"
@@ -79,7 +80,7 @@ void UPlayerActionsComponent::BeginPlay()
 			UE_LOG(LogTemp, Error, TEXT("Failed to find LoadoutComponent on character %s"), *GetOwner()->GetName());
 		}
 	}
-
+	CurrentSlot = LoadoutComp->GetCurrentActiveSlot();
 }
 
 // Called every frame
@@ -150,25 +151,11 @@ void UPlayerActionsComponent::HandleWeaponPickUp(AWeaponPickup* WeaponPickup)
 		UE_LOG(LogTemp, Error, TEXT("HandleWeaponPickUp failed: WeaponPickup is null"));
 		return;
 	}
-    
-	if (!CharacterRef.IsValid())
-	{
-		UE_LOG(LogTemp, Error, TEXT("HandleWeaponPickUp failed: CharacterRef is invalid"));
-		return;
-	}
-    
-	if (!LoadoutComp)
-	{
-		UE_LOG(LogTemp, Error, TEXT("HandleWeaponPickUp failed: LoadoutComp is null"));
-		return;
-	}
-
-
-	if (!WeaponPickup->WeaponToSpawn)
-	{
-		UE_LOG(LogTemp, Error, TEXT("HandleWeaponPickUp failed: WeaponToSpawn is null."));
-		return;
-	}
+	// if (!WeaponPickup->WeaponToSpawn)
+	// {
+	// 	UE_LOG(LogTemp, Error, TEXT("HandleWeaponPickUp failed: WeaponToSpawn is null."));
+	// 	return;
+	// }
 
 	// Spawns Weapon on Character
 	AWeaponMaster* SpawnedWeapon = GetWorld()->SpawnActor<AWeaponMaster>(
@@ -193,11 +180,16 @@ void UPlayerActionsComponent::HandleWeaponPickUp(AWeaponPickup* WeaponPickup)
 		LoadoutComp->AddToLoadout(ELoadoutSlot::Secondary, SpawnedWeapon);
 		LoadoutComp->SetCurrentActiveSlot(ELoadoutSlot::Secondary);
 	}
+	else if (LoadoutComp->IsPrimarySlotFree())
+	{
+		LoadoutComp->AddToLoadout(ELoadoutSlot::Primary, SpawnedWeapon);
+		LoadoutComp->SetCurrentActiveSlot(ELoadoutSlot::Primary);
+	}
 	else
 	{
-		LoadoutComp->RemoveFromLoadout(CurrentActiveSlot);
-		LoadoutComp->AddToLoadout(CurrentActiveSlot, SpawnedWeapon);
-		LoadoutComp->SetCurrentActiveSlot(CurrentActiveSlot);
+		LoadoutComp->RemoveFromLoadout(CurrentSlot);
+		LoadoutComp->AddToLoadout(CurrentSlot, SpawnedWeapon);
+		LoadoutComp->SetCurrentActiveSlot(CurrentSlot);
 	}
 
 	AttachWeaponToSocket(SpawnedWeapon, SpawnedWeapon->WeaponSocketName);
@@ -206,7 +198,7 @@ void UPlayerActionsComponent::HandleWeaponPickUp(AWeaponPickup* WeaponPickup)
 	InitializeAmmoFromWeapon(SpawnedWeapon);
 
 	WeaponPickup->Destroy();
-
+	UE_LOG(LogTemp, Warning, TEXT("Current Active Slot: %d"), static_cast<int32>(CurrentSlot));
 	UE_LOG(LogTemp, Log, TEXT("Weapon %s successfully picked up and equipped."), *SpawnedWeapon->GetName());
 
 }
@@ -372,61 +364,70 @@ void UPlayerActionsComponent::InitializeAmmoFromWeapon(AWeaponMaster* WeaponMast
 	CurrentAmmoReserve = WeaponMaster->StartingAmmoReserve;
 }
 
-void UPlayerActionsComponent::SwapWeapon(ELoadoutSlot Slot)
+void UPlayerActionsComponent::SwitchToWeaponSlot(ELoadoutSlot Slot)
 {
-    if (!CharacterRef.IsValid())
-    {
-        UE_LOG(LogTemp, Warning, TEXT("CharacterRef is invalid in SwapWeapon."));
-        return;
-    }
-	
-    if (!LoadoutComp)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("LoadoutComponent not found on %s."), *CharacterRef->GetName());
-        return;
-    }
-
 	if (!LoadoutComp->Loadout.Contains(Slot) || !LoadoutComp->Loadout[Slot])
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No weapon found in Loadout Slot %d."), static_cast<uint8>(Slot));
 		return;
 	}
 
+	if (bIsSwapping)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Already swapping weapons, cannot swap now."));
+		return;
+	}
+
+	bIsSwapping = true;
+	AWeaponMaster* NewWeapon = LoadoutComp->Loadout[Slot];
+
+	USkeletalMeshComponent* CurrentWeaponMesh = CharacterRef->CurrentWeapon
+		? CharacterRef->CurrentWeapon->WeaponModel : nullptr;
+	
     if (LoadoutComp->Loadout.Contains(Slot) && LoadoutComp->Loadout[Slot])
     {
-        AWeaponMaster* NewWeapon = LoadoutComp->Loadout[Slot];
-        USkeletalMeshComponent* CurrentWeaponMesh = CharacterRef->CurrentWeapon
-            ? CharacterRef->CurrentWeapon->WeaponModel : nullptr;
-
         if (NewWeapon)
         {
             // Unequip the current weapon
             if (CharacterRef->CurrentWeapon)
             {
+            	UE_LOG(LogTemp, Warning, TEXT("Setting current weapon %s to invisible"), 
+		   *CharacterRef->CurrentWeapon->GetName());
             	CurrentWeaponMesh->SetVisibility(false);
                 CurrentWeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
                 CurrentWeaponMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
-            	CurrentWeaponMesh->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
-            	CurrentWeaponMesh->SetVisibility(false);
             }
-
-            // Equip the new weapon
+        	
             CharacterRef->CurrentWeapon = NewWeapon;
             InitializeAmmoFromWeapon(NewWeapon);
 
-            AttachWeaponToSocket(NewWeapon, NewWeapon->WeaponSocketName);
-            if (NewWeapon->WeaponModel)
+            if (!NewWeapon->WeaponModel)
             {
-                NewWeapon->WeaponModel->SetVisibility(true); 
-                NewWeapon->WeaponModel->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+            	UE_LOG(LogTemp, Error, TEXT("Weapon model is null for %s"), *NewWeapon->GetName());
+            	bIsSwapping = false;
+            	return;
             }
-        	
+
+        	USkeletalMeshComponent* NewWeaponMesh = NewWeapon->WeaponModel;
+
+        	NewWeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        	NewWeaponMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+        	NewWeaponMesh->SetSimulatePhysics(false);
+
+            AttachWeaponToSocket(NewWeapon, NewWeapon->WeaponSocketName);
+
+        	UE_LOG(LogTemp, Warning, TEXT("Setting new weapon %s to visible"), *NewWeapon->GetName());
+
+        	NewWeaponMesh->SetVisibility(true);
+
             LoadoutComp->SetCurrentActiveSlot(Slot);
+        	CurrentSlot = Slot;
+        	
+        	UE_LOG(LogTemp, Warning, TEXT("Current Active Slot: %d %hhd"),
+        		static_cast<int32>(CurrentSlot),
+        		CharacterRef->CurrentWeapon->WeaponName);
         }
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("No weapon found in Loadout Slot %d."), static_cast<uint8>(Slot));
+        	bIsSwapping = false;
     }
 }
 
@@ -434,10 +435,7 @@ void UPlayerActionsComponent::EquipWeapon(ELoadoutSlot Slot)
 {
 	if (LoadoutComp->Loadout.Contains(Slot))
 	{
-		// Need to incorporate the TMAP and check for primary and secondary
-		AWeaponMaster* NewWeapon = LoadoutComp->Loadout[Slot];;
-		
-		if (NewWeapon)
+		if (AWeaponMaster* NewWeapon = LoadoutComp->Loadout[Slot])
 		{
 			// Dequip the current weapon (detach, disable it)
 			if (CharacterRef->CurrentWeapon)
@@ -456,4 +454,12 @@ void UPlayerActionsComponent::EquipWeapon(ELoadoutSlot Slot)
 			LoadoutComp->SetCurrentActiveSlot(Slot);
 		}
 	}
+}
+
+void UPlayerActionsComponent::ToggleWeapon()
+{
+	if (CurrentSlot == ELoadoutSlot::Primary)
+		SwitchToWeaponSlot(ELoadoutSlot::Secondary);
+	else
+		SwitchToWeaponSlot(ELoadoutSlot::Primary);
 }
