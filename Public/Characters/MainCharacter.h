@@ -71,8 +71,8 @@ public:
 
 	virtual bool HasEnoughStamina(float Cost) override;
 
-	virtual void EquipWeapon(ELoadoutSlot Slot) override;
-
-	virtual void SwapWeapon(ELoadoutSlot Slot) override;
-	
+	// virtual void EquipWeapon(ELoadoutSlot Slot, AWeaponMaster* Weapon) override;
+	//
+	// virtual void SwapWeapon(ELoadoutSlot Slot) override;
+	//
 };

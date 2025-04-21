@@ -46,8 +46,6 @@ class ZOMBIES_API UPlayerActionsComponent : public UActorComponent, public IInte
 	
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* FireAnimMontage;
-	
-	bool bIsFiring{ false };
 
 	bool bIsSwapping{ false };
 	
@@ -57,11 +55,14 @@ class ZOMBIES_API UPlayerActionsComponent : public UActorComponent, public IInte
 	
 	FVector GetSpawnLocation() const;
 
-	UTraceComponent* GetTraceComponent();
+	UTraceComponent* GetTraceComponent() const;
 
 	
 public:
 	UPlayerActionsComponent();
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsFiring{ false };
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsReloadActive{ false };
@@ -78,8 +79,6 @@ protected:
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
-	void SpawnWeapon(AWeaponMaster* WeaponToSpawn);
 
 	void HandleWeaponPickUp(AWeaponPickup* WeaponPickup);
 
@@ -104,10 +103,10 @@ public:
 	void StopFire();
 
 	UFUNCTION(BlueprintCallable)
-	void Sprint();
+	void Sprint() const;
 
 	UFUNCTION(BlueprintCallable)
-	void Walk();
+	void Walk() const;
 
 	UFUNCTION(BlueprintCallable)
 	virtual int32 GetCurrentMagAmmo() const override { return CurrentMagAmmo; }
@@ -121,9 +120,7 @@ public:
 	
 	void InitializeAmmoFromWeapon(AWeaponMaster* WeaponMaster);
 	
-	void SwitchToWeaponSlot(ELoadoutSlot Slot);
-
-	void AddAndEquip(ELoadoutSlot Slot, AWeaponMaster* Weapon);
+	void SwitchWeaponSlot(ELoadoutSlot Slot);
 
 	void EquipWeapon(ELoadoutSlot Slot);
 
@@ -131,5 +128,4 @@ public:
 	void ToggleWeapon();
 
 	ELoadoutSlot CurrentSlot;
-
 };

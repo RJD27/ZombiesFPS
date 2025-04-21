@@ -24,8 +24,7 @@ class ZOMBIES_API ULoadoutComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	ULoadoutComponent();
-
-	UPROPERTY(BlueprintReadOnly)
+	
 	TMap<ELoadoutSlot, AWeaponMaster*> Loadout;
 	
 protected:
@@ -46,9 +45,7 @@ public:
 	bool SetCurrentActiveSlot(ELoadoutSlot NewSlot);
 
 	UFUNCTION(BlueprintCallable)
-	ELoadoutSlot GetCurrentActiveSlot() const{
-		return CurrentActiveSlot;
-	}
+	ELoadoutSlot GetCurrentActiveSlot() const{ return CurrentActiveSlot; }
 	
 	AWeaponMaster* GetWeapon(ELoadoutSlot Slot) const;
 

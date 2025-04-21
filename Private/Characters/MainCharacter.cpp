@@ -74,23 +74,29 @@ bool AMainCharacter::HasEnoughStamina(float Cost)
 	return StatsComp->Stats[EStat::Stamina] >= Cost;
 }
 
-void AMainCharacter::EquipWeapon(ELoadoutSlot Slot)
-{
-	if (PlayerActionsComp)
-	{
-		PlayerActionsComp->EquipWeapon(Slot);
-	}
-}
-
-
-void AMainCharacter::SwapWeapon(ELoadoutSlot Slot)
-{
-	if (!LoadoutComp) return;
-
-	if (!LoadoutComp->Loadout.Contains(Slot) || !LoadoutComp->Loadout[Slot])
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Attempted to swap to empty slot %d"), static_cast<int32>(Slot));
-		return;
-	}
-	EquipWeapon(Slot);
-}
+// void AMainCharacter::EquipWeapon(ELoadoutSlot Slot, AWeaponMaster* Weapon)
+// {
+// 	if (PlayerActionsComp && LoadoutComp)
+// 	{
+// 		LoadoutComp->AddToLoadout(Slot, Weapon);
+// 		PlayerActionsComp->EquipWeapon(Slot);
+// 	}
+//
+// }
+//
+//
+// void AMainCharacter::SwapWeapon(ELoadoutSlot Slot)
+// {
+// 	if (!LoadoutComp) return;
+//
+// 	if (!LoadoutComp->Loadout.Contains(Slot))
+// 	{
+// 		UE_LOG(LogTemp, Warning, TEXT("Attempted to swap to empty slot %d"), static_cast<int32>(Slot));
+// 		return;
+// 	}
+// 	if (PlayerActionsComp)
+// 	{
+// 		PlayerActionsComp->SwitchWeaponSlot(Slot);
+// 	}
+//
+// }
